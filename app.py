@@ -1,39 +1,51 @@
-import os
-import openai
+from openai import OpenAI
 import json
+from flask import Flask, jsonify,request
+from flask_cors import CORS
 
 # 填你的秘钥
-openai.api_key = "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"
+# openai.api_key = "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"
+client = OpenAI(
+    # defaults to os.environ.get("OPENAI_API_KEY")
+    api_key= "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",
+)
 
+# chat_completion = client.chat.completions.create(
+#     messages=[
+#         {
+#             "role": "user",
+#             "content": "Say this is a test",
+#         }
+#     ],
+#     model="gpt-3.5-turbo",
+# )
 # 提问代码
+messages=[]
 def chat_gpt(prompt):
     # 你的问题
     prompt = prompt
     
     # 调用 ChatGPT 接口
-    model_engine = "text-davinci-003"
-    completion = openai.Completion.create(
-        engine=model_engine,
-        prompt=prompt,
-        max_tokens=1024,
-        n=1,
-        stop=None,
-        temperature=0.5,
+    completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": "Say this is a test",
+            }
+        ],
+        model="gpt-3.5-turbo",
     )
+    response = completion.choices[0].message
 
-    response = completion.choices[0].text
     return response
 
-from flask import Flask, jsonify,request
-import random
-from flask_cors import CORS
+
 
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/api', methods=['GET'])
 def getAnswer():
-    # messageinfo = json.loads(request.args.get('data'))
     messageinfo = request.args.get('messageinfo', default=1, type=str)
     print(messageinfo)
     res = chat_gpt(messageinfo)
